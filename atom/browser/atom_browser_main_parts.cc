@@ -52,13 +52,13 @@ AtomBrowserMainParts* AtomBrowserMainParts::Get() {
 
 content::BrowserContext* AtomBrowserMainParts::GetBrowserContextForPartition(
     const std::string& partition, bool in_memory) {
-  if (browser_context_map_.contains(partition))
-    return browser_context_map_.get(partition);
+  if (ContainsKey(browser_context_map_, partition))
+    return browser_context_map_[partition].get();
 
-  scoped_ptr<brightray::BrowserContext> browser_context(CreateBrowserContext());
+  brightray::BrowserContext* browser_context = CreateBrowserContext();
   browser_context->Initialize(partition, in_memory);
-  browser_context_map_.set(partition, browser_context.Pass());
-  return browser_context_map_.get(partition);
+  browser_context_map_[partition] = make_scoped_refptr(browser_context);
+  return browser_context;
 }
 
 void AtomBrowserMainParts::RegisterDestructionCallback(
